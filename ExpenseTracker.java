@@ -1,280 +1,342 @@
+// we are using Swing for GUI. 
+
+// this will import all the swing package
+import javax.swing.*;
+
+// it is a package used to import empty border class, it helped us in keeping empty border around our components.
+import javax.swing.border.EmptyBorder;
+
+// this will import the default table model class, we used this for managing data in our table.
+import javax.swing.table.DefaultTableModel;
+
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Scanner;
 
-// Parent class that will be used for other classes. All classes will be derived from here. //
 
-class Transaction {
-    String Date;
-    double Amount;
-
-    // Constructor for transaction class // 
-
-    Transaction(String Date, double Amount) {
-        this.Date = Date;
-        this.Amount = Amount;
-    }
-}
-
-// Deriving a child class from Transaction, using super keyword to get get Date and Amount from base class. //
-
-class Expense extends Transaction {
-    String Type;
-
-    // Constructor for child class //
-
-    Expense(String Date, String Type, double Amount) 
+// Parent class for transactions
+class Transaction 
 {
-        super(Date, Amount);
-        this.Type = Type;
-    }
+    String date;
+    double amount;
 
-    // Defining how the object's data appears for better readability //
-
-
-    public String toString() 
-{
-        return String.format("%-15s %-15s ₹%.2f", Date, Type, Amount);
+    Transaction(String date, double amount)
+    {
+        this.date = date;
+        this.amount = amount;
     }
 }
 
 
 
-
-// Interface for operations for defining methods. //
-
-
-interface ExpenseOps 
+// Derived class for Expenses
+class Expense extends Transaction 
 {
-    void addExpense(); // adding exp to the list
-    void editExpense(); // editing exp from the list
-    void deleteExpense(); // deleting exp from the list
-    void viewExpense(); // viewing the list
-    void viewTotal(); // getting total exp
-    void giveFeedback();  // taking user input for feedback
+    String type;
+
+    Expense(String date, String type, double amount) 
+    {
+        super(date, amount);
+        this.type = type;
+    }
+
+    
+    public String toString()
+    {
+        return String.format("%-15s %-15s ₹%.2f", date, type, amount);
+    }
 }
 
-// Expense manager that uses the interface  //
+
+// Interface for Expense operations
+
+interface ExpenseOps
+    {
+    void addExpense();
+    void editExpense();
+    void deleteExpense();
+    void viewTotal();
+    void viewByCategory();
+}
 
 
-class ExpenseManager implements ExpenseOps
- {
+
+// Expense Tracker that implements ExpenseOps interface
+
+public class ExpenseTracker extends JFrame implements ExpenseOps 
+{
     ArrayList<Expense> expenses = new ArrayList<>();
-    Scanner sc = new Scanner(System.in);
+    DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Date", "Type", "Amount"}, 0);
+    JTable expenseTable = new JTable(tableModel);
+    String[] expenseTypes = {"Food", "Grocery", "Electricity Bills", "Telephone Bills", "Travel", "Miscellaneous"};
 
-    // Method to get input for expense. it does not allow negative value //
 
 
-    public void addExpense() {
-        System.out.println("Enter the date (dd/mm/yyyy): ");
-        String Date = sc.nextLine();
+// constructor for GUI
 
-        System.out.println("Enter the type of expense: ");
-        String Type = sc.nextLine();
+    public ExpenseTracker()
+    {
+        setTitle("Simple Expense Tracker");
+        setSize(600, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
 
-        double Amount;
-        while (true) 
-{
-            System.out.println("Enter the amount in rupees: ");
-            Amount = sc.nextDouble();
-            sc.nextLine(); 
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        add(mainPanel);
 
-            // here we are checking for negative input to make sure user enters only positive number. if negative number is entered it will print the else block. //
+        // Button panel for entering expenses
 
-            if (Amount >= 0)
- {
-                break; 
-            } 
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(1, 5, 5, 5));
 
-else 
-{
-                System.out.println("Amount cannot be negative. Please enter a valid amount.");
+
+
+// creating buttons for different operations
+        
+        JButton addButton = new JButton("Add Expense");
+        addButton.setBackground(new Color(255, 182, 193));
+        JButton editButton = new JButton("Edit Expense");
+        editButton.setBackground(new Color(219, 179, 255));
+        JButton deleteButton = new JButton("Delete Expense");
+        deleteButton.setBackground(new Color(173, 216, 230));
+        JButton viewButton = new JButton("View Total");
+        viewButton.setBackground(new Color(255, 236, 179));
+        JButton categoryButton = new JButton("View by Category");
+        categoryButton.setBackground(new Color(144, 238, 144));
+
+
+
+// adding our buttons for the panel
+        buttonPanel.add(addButton);
+        buttonPanel.add(editButton);
+        buttonPanel.add(deleteButton);
+        buttonPanel.add(viewButton);
+        buttonPanel.add(categoryButton);
+        mainPanel.add(buttonPanel, BorderLayout.NORTH);
+
+
+
+        // Create a new JPanel for the table 
+        JPanel tablePanel = new JPanel();
+        tablePanel.setLayout(new BorderLayout());
+        tablePanel.setBorder(new EmptyBorder(10, 20, 10, 20)); 
+
+        expenseTable.setFillsViewportHeight(true);
+        tablePanel.add(new JScrollPane(expenseTable), BorderLayout.CENTER); 
+        mainPanel.add(tablePanel, BorderLayout.CENTER); 
+
+
+
+// add action listeners for the buttons
+
+        addButton.addActionListener(new ActionListener()
+         {
+            public void actionPerformed(ActionEvent e)
+            {
+                addExpense();
             }
+        });
+
+        editButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e) 
+            {
+                editExpense();
+            }
+        });
+
+        deleteButton.addActionListener(new ActionListener() 
+            {
+            public void actionPerformed(ActionEvent e) 
+        {
+                deleteExpense();
+            }
+        });
+
+        viewButton.addActionListener(new ActionListener() 
+            {
+            public void actionPerformed(ActionEvent e) 
+            {
+                viewTotal();
+            }
+        });
+
+        categoryButton.addActionListener(new ActionListener() 
+            {
+            public void actionPerformed(ActionEvent e)
+            {
+                viewByCategory();
+            }
+        });
+
+        setVisible(true);
+    }
+
+
+
+// method to add new expense
+
+    public void addExpense() 
+    {
+        String date = JOptionPane.showInputDialog("Enter Date (DD/MM/YYYY):");
+        String type = (String) JOptionPane.showInputDialog(this, "Select Expense Type:", "Expense Type",
+                JOptionPane.QUESTION_MESSAGE, null, expenseTypes, expenseTypes[0]);
+        String amountStr = JOptionPane.showInputDialog("Enter Amount:");
+
+        if (isValidDate(date) && type != null && !amountStr.isEmpty())
+        {
+            double amount = Double.parseDouble(amountStr);
+            Expense expense = new Expense(date, type, amount);
+            expenses.add(expense);
+            tableModel.addRow(new Object[]{expense.date, expense.type, expense.amount});
+            JOptionPane.showMessageDialog(this, "Expense added successfully!");
+        } else 
+        
+        {
+            JOptionPane.showMessageDialog(this, "Invalid input. Please try again.");
         }
-
-
-        expenses.add(new Expense(Date, Type, Amount));
-        System.out.println("Expense has been added.");
     }
 
 
 
 
+// method to edit expense
+
+    public void editExpense()
+    {
+        int selectedRow = expenseTable.getSelectedRow();
+        if (selectedRow >= 0) 
+        
+        {
+            String date = JOptionPane.showInputDialog("Enter new Date (DD/MM/YYYY):", expenses.get(selectedRow).date);
+            String type = (String) JOptionPane.showInputDialog(this, "Select new Expense Type:", "Expense Type",
+                    JOptionPane.QUESTION_MESSAGE, null, expenseTypes, expenses.get(selectedRow).type);
+            String amountStr = JOptionPane.showInputDialog("Enter new Amount:", expenses.get(selectedRow).amount);
+
+            if (isValidDate(date) && type != null && !amountStr.isEmpty())
+            
+            {
+                double amount = Double.parseDouble(amountStr);
+                expenses.set(selectedRow, new Expense(date, type, amount));
+                tableModel.setValueAt(date, selectedRow, 0);
+                tableModel.setValueAt(type, selectedRow, 1);
+                tableModel.setValueAt(amount, selectedRow, 2);
+                JOptionPane.showMessageDialog(this, "Expense updated successfully!");
+            } 
+            
+            else
+            {
+                JOptionPane.showMessageDialog(this, "Invalid input. Please try again.");
+            }
+        } 
+        else
+        {
+            JOptionPane.showMessageDialog(this, "Please select an expense to edit.");
+        }
+    }
 
 
-    // Method to edit an expense. here also we have added negative checking because user will be entering expense here as well. so we should be able to restrict it. //
 
+// method to delete expense
 
-    public void editExpense() {
-        viewExpense(); // View is called to display expense to user before editing so that the user chooses the right option to edit. //
-
-        System.out.println("Enter the index of the expense to edit: ");
-        int index = sc.nextInt() - 1;
-        sc.nextLine();
-
-        if (index >= 0 && index < expenses.size()) {
-            System.out.println("Enter new date (dd/mm/yyyy): "); // we are working on restricting the date format also. right now it does not have any restrictions. //
-
-            String Date = sc.nextLine();
-
-
-
-
-            System.out.println("Enter new type of expense: ");
-            String Type = sc.nextLine();
-
-            double Amount;
-            while (true) {
-                System.out.println("Enter new amount: ");
-                Amount = sc.nextDouble();
-                sc.nextLine(); 
+    public void deleteExpense()
+    {
+        int selectedRow = expenseTable.getSelectedRow();
+        if (selectedRow >= 0) 
+        {
+            expenses.remove(selectedRow);
+            tableModel.removeRow(selectedRow);
+            JOptionPane.showMessageDialog(this, "Expense deleted successfully!");
+        } 
+        
+        
+        else
+        
+        {
+            JOptionPane.showMessageDialog(this, "Please select an expense to delete.");
+        }
+    }
 
 
 
-                // Check for negative input here also as the user is entering a new expense. //
-                if (Amount >= 0) 
-{
-                    break;
 
-                } 
-else 
-{
-                    System.out.println("Amount cannot be negative. Please enter a valid amount.");
+// method to view total
+
+    public void viewTotal()
+    {
+        double total = 0;
+        for (Expense expense : expenses) 
+        {
+            total += expense.amount;
+        }
+        JOptionPane.showMessageDialog(this, "Total Expenses: ₹" + total);
+    }
+
+
+
+// method to view by category
+
+    public void viewByCategory()
+    {
+        String selectedType = (String) JOptionPane.showInputDialog(this, "Select Expense Type to View:", "View by Category",
+                JOptionPane.QUESTION_MESSAGE, null, expenseTypes, expenseTypes[0]);
+        if (selectedType != null) 
+        {
+            StringBuilder categories = new StringBuilder();
+            for (Expense expense : expenses) 
+            {
+                if (expense.type.equals(selectedType)) 
+                {
+                    categories.append(expense).append("\n");
                 }
             }
-
-            expenses.set(index, new Expense(Date, Type, Amount));
-            System.out.println("The expense has been updated.");
-        } 
-else 
-{
-            System.out.println("Invalid index.");
-        }
-    }
-
-    // Method to delete an expense if the user chooses this option //
-
-
-    public void deleteExpense() {
-        viewExpense(); // So the user can view the expense before deleting it. //
-
-
-        System.out.println("Enter the index of the expense to delete: ");
-        int index = sc.nextInt() - 1;
-        sc.nextLine(); 
-
-        if (index >= 0 && index < expenses.size())
- {
-            expenses.remove(index);
-            System.out.println("Expense Deleted.");
-        } 
-else 
-{
-            System.out.println("Invalid index.");
-        }
-    }
-
-    // Method to view all expenses. this method is called in the edit and delete methods also. so it is very useful. //
-
-
-    public void viewExpense() {
-        if (expenses.isEmpty()) {
-            System.out.println("No expenses recorded.");
-        } else {
-            System.out.printf("%-5s %-15s %-15s %-15s\n", "No.", "Date", "Type", "Amount");
-// this format is used for better readability of the code. //
-
-            for (int i = 0; i < expenses.size(); i++) {
-                System.out.printf("%-5d %s\n", (i + 1), expenses.get(i).toString());
+            if (categories.length() > 0) 
+            {
+                JOptionPane.showMessageDialog(this, "Expenses in " + selectedType + ":\n" + categories.toString());
+            } 
+            
+            else 
+            
+            {
+                JOptionPane.showMessageDialog(this, "No expenses found for the selected category.");
             }
         }
     }
 
-    // Method to get the total of all the expenses //
 
 
+// method to validate our input by user
 
-    public void viewTotal() {
-        double total = 0;
-        for (Expense expense : expenses) {
-            total = total + expense.Amount;
+    private boolean isValidDate(String date) 
+    
+    {
+        String[] parts = date.split("/");
+        if (parts.length != 3) return false;
+        int day, month, year;
+        try
+            {
+            day = Integer.parseInt(parts[0]);
+            month = Integer.parseInt(parts[1]);
+            year = Integer.parseInt(parts[2]);
         }
-        System.out.println("Total Expense: ₹" + total);
+        catch (NumberFormatException e)
+            {
+            return false;
+        }
+       
+        return (day > 0 && day <= 31 && month > 0 && month <= 12);
     }
 
-    // method to get feedback and rating from the user. //
 
 
-    public void giveFeedback() {
-        System.out.println("Enter your feedback: ");
-        String feedback = sc.nextLine();
+// main method to run the java expense tracker
 
-        int rating;
-        while (true) {
-            System.out.println("Rate your experience (1 to 5): ");
-            rating = sc.nextInt();
-            sc.nextLine(); 
-
-
-
-            // taking rating input from the user //
-
-
-            if (rating >= 1 && rating <= 5) {
-                break; // Exit loop if valid input
-            } else {
-                System.out.println("Rating must be between 1 and 5. Please enter a valid rating.");
-            }
-        }
-
-        // we are taking input in string format above and then we print out the feedback and the rating in the end of this method// 
-
-
-        System.out.println("Thank you for your feedback: " + feedback + " | Rating: " + rating);
-    }
-}
-
-
-
-// Main class
-public class ExpenseTracker 
-{
-    public static void main(String[] args) 
-{
-        ExpenseManager manager = new ExpenseManager();
-        Scanner sc = new Scanner(System.in);
-
-        while (true) 
-{
-            System.out.println("\n1. Add Expense\n2. Edit Expense\n3. Delete Expense\n4. View Expenses\n5. View Total\n6. Give Feedback\n7. Exit");
-            System.out.println("Choose an option.");
-            int choice = sc.nextInt();
-            sc.nextLine(); 
-
-            switch (choice) 
-{
-                case 1: 
-                    manager.addExpense(); 
-                    break;
-                case 2:
-                    manager.editExpense();
-                    break;
-                case 3:
-                    manager.deleteExpense();
-                    break;
-                case 4:
-                    manager.viewExpense();
-                    break;
-                case 5:
-                    manager.viewTotal();
-                    break;
-                case 6:
-                    manager.giveFeedback(); 
-                    break;
-                case 7:
-                    System.exit(0);
-                default:
-                    System.out.println("Invalid option.");
-            }
-        }
+    public static void main(String[] args)
+    
+    {
+        new ExpenseTracker();
     }
 }
