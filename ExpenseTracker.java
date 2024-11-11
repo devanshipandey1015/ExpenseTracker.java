@@ -3,10 +3,10 @@
 // this will import all the swing package
 import javax.swing.*;
 
-// it is a package used to import empty border class, it helped us in keeping empty border around our components.
+// it is a package used to import empty border class, it helped us in keeping empty border around our components (line 87, 125).
 import javax.swing.border.EmptyBorder;
 
-// this will import the default table model class, we used this for managing data in our table.
+// this will import the default table model class, we used this for managing data in our table (declared on line 71).
 import javax.swing.table.DefaultTableModel;
 
 
@@ -46,6 +46,12 @@ class Expense extends Transaction
     public String toString()
     {
         return String.format("%-15s %-15s ₹%.2f", date, type, amount);
+        // string.format is used to create a formatted string based on specified type.
+        // - is for left aligned, 15 for characters, s for string : DATE
+        // - again we used for left aligned, 15 for characaters, s for string: TYPE
+        // .2 is for 2 decimal spaces. f is for float: AMOUNT
+        
+
     }
 }
 
@@ -59,6 +65,7 @@ interface ExpenseOps
     void deleteExpense();
     void viewTotal();
     void viewByCategory();
+        
 }
 
 
@@ -69,6 +76,8 @@ public class ExpenseTracker extends JFrame implements ExpenseOps
 {
     ArrayList<Expense> expenses = new ArrayList<>();
     DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Date", "Type", "Amount"}, 0);
+    // WE SET IT TO 0 HERE SO THAT THE TABLE STARTS WITH 0 ROWS. 
+    
     JTable expenseTable = new JTable(tableModel);
     String[] expenseTypes = {"Food", "Grocery", "Electricity Bills", "Telephone Bills", "Travel", "Miscellaneous"};
 
@@ -98,23 +107,29 @@ public class ExpenseTracker extends JFrame implements ExpenseOps
         
         JButton addButton = new JButton("Add Expense");
         addButton.setBackground(new Color(255, 182, 193));
+        
         JButton editButton = new JButton("Edit Expense");
         editButton.setBackground(new Color(219, 179, 255));
+        
         JButton deleteButton = new JButton("Delete Expense");
         deleteButton.setBackground(new Color(173, 216, 230));
+        
         JButton viewButton = new JButton("View Total");
         viewButton.setBackground(new Color(255, 236, 179));
+        
         JButton categoryButton = new JButton("View by Category");
         categoryButton.setBackground(new Color(144, 238, 144));
 
 
 
 // adding our buttons for the panel
+        
         buttonPanel.add(addButton);
         buttonPanel.add(editButton);
         buttonPanel.add(deleteButton);
         buttonPanel.add(viewButton);
         buttonPanel.add(categoryButton);
+        
         mainPanel.add(buttonPanel, BorderLayout.NORTH);
 
 
@@ -124,7 +139,10 @@ public class ExpenseTracker extends JFrame implements ExpenseOps
         tablePanel.setLayout(new BorderLayout());
         tablePanel.setBorder(new EmptyBorder(10, 20, 10, 20)); 
 
+        // Makes the table background fill the entire viewport height
+// viewport: visible area of scrollable component
         expenseTable.setFillsViewportHeight(true);
+        
         tablePanel.add(new JScrollPane(expenseTable), BorderLayout.CENTER); 
         mainPanel.add(tablePanel, BorderLayout.CENTER); 
 
