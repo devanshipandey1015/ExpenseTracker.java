@@ -1,19 +1,19 @@
-// we are using Swing for GUI. 
+// we have used Swing for gui.
 
-// this will import all the swing package
+// this will import all swing packages.
 import javax.swing.*;
 
-// it is a package used to import empty border class, it helped us in keeping empty border around our components (line 87, 125).
+// this will import empty borders, it helped us in keeping empty border around our components.
 import javax.swing.border.EmptyBorder;
 
-// this will import the default table model class, we used this for managing data in our table (declared on line 71).
+//  this will import the default table model class, we used this for managing data in our table.
 import javax.swing.table.DefaultTableModel;
-
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+
 
 
 // Parent class for transactions
@@ -22,6 +22,7 @@ class Transaction
     String date;
     double amount;
 
+    // constructor for transaction
     Transaction(String date, double amount)
     {
         this.date = date;
@@ -29,163 +30,153 @@ class Transaction
     }
 }
 
-
-
 // Derived class for Expenses
 class Expense extends Transaction 
 {
     String type;
 
-    Expense(String date, String type, double amount) 
+    // constructor for expenses
+    Expense(String date, String type, double amount)
     {
         super(date, amount);
         this.type = type;
     }
 
     
-    public String toString()
+    public String toString() 
     {
         return String.format("%-15s %-15s ₹%.2f", date, type, amount);
+
+
         // string.format is used to create a formatted string based on specified type.
         // - is for left aligned, 15 for characters, s for string : DATE
         // - again we used for left aligned, 15 for characaters, s for string: TYPE
         // .2 is for 2 decimal spaces. f is for float: AMOUNT
-        
-
     }
 }
 
 
-// Interface for Expense operations
 
+// Interface for Expense operations
 interface ExpenseOps
-    {
+{
+    // only declaring methods here. 
+    
     void addExpense();
     void editExpense();
     void deleteExpense();
     void viewTotal();
     void viewByCategory();
-        
 }
-
-
 
 // Expense Tracker that implements ExpenseOps interface
 
 public class ExpenseTracker extends JFrame implements ExpenseOps 
 {
     ArrayList<Expense> expenses = new ArrayList<>();
-    DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Date", "Type", "Amount"}, 0);
-    // WE SET IT TO 0 HERE SO THAT THE TABLE STARTS WITH 0 ROWS. 
+
+    // to make cells non-editable on clicking them.
+    
+    DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Date", "Type", "Amount"}, 0)
+    {
+        public boolean isCellEditable(int row, int column)
+        {
+            return false; 
+        }
+    };
+
+
     
     JTable expenseTable = new JTable(tableModel);
     String[] expenseTypes = {"Food", "Grocery", "Electricity Bills", "Telephone Bills", "Travel", "Miscellaneous"};
 
-
-
-// constructor for GUI
-
-    public ExpenseTracker()
+    
+    public ExpenseTracker() 
     {
-        setTitle("Simple Expense Tracker");
+        setTitle("Expense Tracker");
         setSize(600, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
+        
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         add(mainPanel);
 
-        // Button panel for entering expenses
-
+        // Button panel for adding new expenses
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(1, 5, 5, 5));
 
-
-
-// creating buttons for different operations
-        
+        // Creating buttons for our ops
         JButton addButton = new JButton("Add Expense");
         addButton.setBackground(new Color(255, 182, 193));
-        
+
         JButton editButton = new JButton("Edit Expense");
         editButton.setBackground(new Color(219, 179, 255));
-        
+
         JButton deleteButton = new JButton("Delete Expense");
         deleteButton.setBackground(new Color(173, 216, 230));
-        
+
         JButton viewButton = new JButton("View Total");
         viewButton.setBackground(new Color(255, 236, 179));
-        
+
         JButton categoryButton = new JButton("View by Category");
         categoryButton.setBackground(new Color(144, 238, 144));
 
 
-
-// adding our buttons for the panel
         
+        // Adding buttons to the panel
         buttonPanel.add(addButton);
         buttonPanel.add(editButton);
         buttonPanel.add(deleteButton);
         buttonPanel.add(viewButton);
         buttonPanel.add(categoryButton);
-        
+
         mainPanel.add(buttonPanel, BorderLayout.NORTH);
 
 
-
+        
         // Create a new JPanel for the table 
         JPanel tablePanel = new JPanel();
         tablePanel.setLayout(new BorderLayout());
-        tablePanel.setBorder(new EmptyBorder(10, 20, 10, 20)); 
+        tablePanel.setBorder(new EmptyBorder(10, 20, 10, 20));
 
-        // Makes the table background fill the entire viewport height
-// viewport: visible area of scrollable component
-        expenseTable.setFillsViewportHeight(true);
         
-        tablePanel.add(new JScrollPane(expenseTable), BorderLayout.CENTER); 
-        mainPanel.add(tablePanel, BorderLayout.CENTER); 
+        // Makes the table background fill the entire viewport height
+        // viewport is basically what we seeing and scrolling component is
+        expenseTable.setFillsViewportHeight(true);
 
+        tablePanel.add(new JScrollPane(expenseTable), BorderLayout.CENTER);
+        mainPanel.add(tablePanel, BorderLayout.CENTER);
 
-
-// add action listeners for the buttons
-
-        addButton.addActionListener(new ActionListener()
-         {
-            public void actionPerformed(ActionEvent e)
-            {
+        // Add action listeners for the buttons
+        
+        addButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 addExpense();
             }
         });
 
-        editButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e) 
-            {
+        editButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 editExpense();
             }
         });
 
-        deleteButton.addActionListener(new ActionListener() 
-            {
-            public void actionPerformed(ActionEvent e) 
-        {
+        deleteButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 deleteExpense();
             }
         });
 
-        viewButton.addActionListener(new ActionListener() 
-            {
-            public void actionPerformed(ActionEvent e) 
-            {
+        viewButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 viewTotal();
             }
         });
 
-        categoryButton.addActionListener(new ActionListener() 
-            {
-            public void actionPerformed(ActionEvent e)
-            {
+        categoryButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
                 viewByCategory();
             }
         });
@@ -193,48 +184,56 @@ public class ExpenseTracker extends JFrame implements ExpenseOps
         setVisible(true);
     }
 
-
-
-// method to add new expense
-
-    public void addExpense() 
+    // Method to add a new expense
+    public void addExpense()
     {
         String date = JOptionPane.showInputDialog("Enter Date (DD/MM/YYYY):");
+        if (!isValidDate(date))
+        {
+            JOptionPane.showMessageDialog(this, "Invalid date format. Please use DD/MM/YYYY.");
+            return; 
+        }
+
+        
         String type = (String) JOptionPane.showInputDialog(this, "Select Expense Type:", "Expense Type",
                 JOptionPane.QUESTION_MESSAGE, null, expenseTypes, expenseTypes[0]);
         String amountStr = JOptionPane.showInputDialog("Enter Amount:");
 
-        if (isValidDate(date) && type != null && !amountStr.isEmpty())
+        if (isValidAmount(amountStr) && type != null && !amountStr.isEmpty()) 
         {
             double amount = Double.parseDouble(amountStr);
             Expense expense = new Expense(date, type, amount);
             expenses.add(expense);
             tableModel.addRow(new Object[]{expense.date, expense.type, expense.amount});
             JOptionPane.showMessageDialog(this, "Expense added successfully!");
-        } else 
-        
+        } 
+        else
         {
             JOptionPane.showMessageDialog(this, "Invalid input. Please try again.");
         }
     }
 
-
-
-
-// method to edit expense
-
+    // Method to edit an expense
     public void editExpense()
     {
         int selectedRow = expenseTable.getSelectedRow();
         if (selectedRow >= 0) 
-        
         {
             String date = JOptionPane.showInputDialog("Enter new Date (DD/MM/YYYY):", expenses.get(selectedRow).date);
+            if (!isValidDate(date)) 
+            {
+                JOptionPane.showMessageDialog(this, "Invalid date format. Please use DD/MM/YYYY.");
+                return; 
+                
+            }
+
+            
             String type = (String) JOptionPane.showInputDialog(this, "Select new Expense Type:", "Expense Type",
                     JOptionPane.QUESTION_MESSAGE, null, expenseTypes, expenses.get(selectedRow).type);
             String amountStr = JOptionPane.showInputDialog("Enter new Amount:", expenses.get(selectedRow).amount);
 
-            if (isValidDate(date) && type != null && !amountStr.isEmpty())
+            
+            if (isValidAmount(amountStr) && type != null && !amountStr.isEmpty()) 
             
             {
                 double amount = Double.parseDouble(amountStr);
@@ -246,77 +245,74 @@ public class ExpenseTracker extends JFrame implements ExpenseOps
             } 
             
             else
+            
             {
                 JOptionPane.showMessageDialog(this, "Invalid input. Please try again.");
             }
         } 
-        else
+        
+        else 
         {
             JOptionPane.showMessageDialog(this, "Please select an expense to edit.");
         }
     }
 
-
-
-// method to delete expense
-
+    // Method to delete an expense
     public void deleteExpense()
+    
     {
         int selectedRow = expenseTable.getSelectedRow();
-        if (selectedRow >= 0) 
+        if (selectedRow >= 0)
+        
         {
             expenses.remove(selectedRow);
             tableModel.removeRow(selectedRow);
             JOptionPane.showMessageDialog(this, "Expense deleted successfully!");
         } 
         
-        
         else
-        
         {
             JOptionPane.showMessageDialog(this, "Please select an expense to delete.");
         }
     }
 
-
-
-
-// method to view total
-
+    // Method to view total expenses
     public void viewTotal()
     {
         double total = 0;
-        for (Expense expense : expenses) 
+        for (Expense expense : expenses)
+            
         {
             total += expense.amount;
         }
         JOptionPane.showMessageDialog(this, "Total Expenses: ₹" + total);
     }
 
-
-
-// method to view by category
-
-    public void viewByCategory()
+    // Method to view expenses by category
+    public void viewByCategory() 
+    
     {
         String selectedType = (String) JOptionPane.showInputDialog(this, "Select Expense Type to View:", "View by Category",
                 JOptionPane.QUESTION_MESSAGE, null, expenseTypes, expenseTypes[0]);
-        if (selectedType != null) 
+        if (selectedType != null)
+        
         {
             StringBuilder categories = new StringBuilder();
-            for (Expense expense : expenses) 
-            {
+            for (Expense expense : expenses)
+                {
                 if (expense.type.equals(selectedType)) 
                 {
                     categories.append(expense).append("\n");
                 }
             }
-            if (categories.length() > 0) 
+            if (categories.length() > 0)
+            
             {
                 JOptionPane.showMessageDialog(this, "Expenses in " + selectedType + ":\n" + categories.toString());
             } 
             
             else 
+            
             
             {
                 JOptionPane.showMessageDialog(this, "No expenses found for the selected category.");
@@ -324,37 +320,50 @@ public class ExpenseTracker extends JFrame implements ExpenseOps
         }
     }
 
-
-
-// method to validate our input by user
-
-    private boolean isValidDate(String date) 
+    // Method to validate the input date
+    private boolean isValidDate(String date)
     
     {
+        if (date == null || date.isEmpty()) return false;
         String[] parts = date.split("/");
         if (parts.length != 3) return false;
         int day, month, year;
         try
+            
             {
             day = Integer.parseInt(parts[0]);
             month = Integer.parseInt(parts[1]);
             year = Integer.parseInt(parts[2]);
-        }
+        } 
+        
         catch (NumberFormatException e)
+            
             {
             return false;
         }
-       
+
         return (day > 0 && day <= 31 && month > 0 && month <= 12);
     }
 
-
-
-// main method to run the java expense tracker
-
-    public static void main(String[] args)
+    // Method to check negative amount input
+    
+    private boolean isValidAmount(String amountStr) 
     
     {
+        try {
+            double amount = Double.parseDouble(amountStr);
+            return amount > 0; 
+        } 
+        
+        catch (NumberFormatException e)
+            
+            {
+            return false;
+        }
+    }
+
+    // Main method to run the application
+    public static void main(String[] args) {
         new ExpenseTracker();
     }
 }
